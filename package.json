@@ -14,6 +14,7 @@
     "testbed:release": "bun run scripts/testbed-release.ts",
     "testbed:smoke": "bun run scripts/testbed-smoke.ts",
     "test:ui": "bun run scripts/test-ui.ts",
+    "test:downstream": "TESTBED_DOWNSTREAM=1 TESTBED_DOWNSTREAM_UI=1 bun test src/server/testbed/downstream.integration.test.ts",
     "start": "cd dist && bun index.js",
     "test": "bun test",
     "test:python": "cd examples/python-core && python3 -m unittest discover -s tests -t .",

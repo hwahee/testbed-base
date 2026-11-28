@@ -2,13 +2,14 @@ import { describe, expect, test } from 'bun:test';
 
 import { testOidcEnv } from './auth/fake-issuer';
 import { loadServerConfig } from './config';
+import { PORT_BLOCK } from './testbed/cores/port-block';
 
 describe('loadServerConfig — testbed defaults', () => {
   test('with no environment at all: memory DB, no sign-in, the port block +0', () => {
     const config = loadServerConfig({});
     expect(config.dbDriver).toBe('memory');
     expect(config.authDriver).toBe('none');
-    expect(config.port).toBe(40000);
+    expect(config.port).toBe(PORT_BLOCK);
   });
 });
 

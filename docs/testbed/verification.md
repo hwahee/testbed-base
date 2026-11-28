@@ -118,12 +118,14 @@ total: 3 pass, 1 fail, 1 skip; coverage PASS
 ## 5. UI 자동화 — `bun run test:ui`
 
 - 위치: 시험은 `e2e/*.e2e.ts`(파일 이름이 `.e2e.ts`라 `bun test` 대상이 아님), 설정은 `playwright.config.ts`, 실행 스크립트는 `scripts/test-ui.ts`. `@playwright/test`는 개발 의존성이고 Chromium만 씁니다.
-- 실행: `bun run test:ui`가 MCP 스모크와 같은 모듈(`src/server/testbed/smoke/server.ts`)로 서버를 빈 포트에 띄우고(`TESTBED_RUN_STORE=memory`, 코어 포트 `0`), 주소를 `TESTBED_UI_URL`로 넘겨 `playwright test`를 돌린 뒤 종료합니다. 뒤에 붙인 인자는 Playwright로 넘어갑니다(예: `bun run test:ui -g "lease"`). 서버를 띄우지 못하면 종료 코드 2입니다.
+- 실행: `bun run test:ui`가 MCP 스모크와 같은 모듈(`src/server/testbed/smoke/server.ts`)로 서버를 빈 포트에 띄우고(`TESTBED_RUN_STORE=memory`, 코어 포트 `0`), 주소를 `TESTBED_UI_URL`로 넘겨 `playwright test`를 돌린 뒤 종료합니다. 이 기본 인스턴스에는 테스트베드 소유 파일 `e2e/testbed.ts`의 준비(`setup.env`와, 서버를 띄우기 전에 한 번 부르는 `setup.prepare({ rootDir, tmpDir })`가 돌려준 env)를 더합니다. 상대 경로는 저장소 루트(서버의 작업 디렉터리) 기준이고, `tmpDir`은 서버를 멈출 때 지웁니다. 공통 런타임의 변형 인스턴스(Python 예제 등)에는 더하지 않습니다. 타입과 합치는 함수는 `e2e/support/testbed-setup.ts`(공통 런타임)입니다. 뒤에 붙인 인자는 Playwright로 넘어갑니다(예: `bun run test:ui -g "lease"`). 서버를 띄우지 못하면 종료 코드 2입니다.
 - 시험들은 인스턴스 하나를 같이 쓰므로 하나씩(`workers: 1`) 돌고, 시험마다 처음에 상태를 되돌립니다(`e2e/helpers.ts`의 `resetTestbed`: 로컬 전용 경로로 락 강제 해제, 열린 Run 닫기, 결함 규칙 비우기, 코어 시작).
 - 제품과 에이전트 흉내는 브라우저 밖에서 합니다. 데이터면은 TCP(`tcp()`), 락과 설정은 REST(`api()`, `takeLease()`, actor `agent`)입니다.
 - 선택자는 ARIA 우선(`getByRole`, `getByLabel`), 그다음 `TESTID`([../ui-automation.md](../ui-automation.md))입니다. 화면 언어는 `en-US`로 고정합니다.
 - 페이지가 아직 모르는 변화를 만들어야 할 때(예: 저장 직전에 락이 걸림)는 `gateLiveUpdates(page)`로 `/testbed/ws` 메시지를 잠시 붙잡아 둡니다(`page.routeWebSocket`).
 - 외부 코어 시험(9번, `e2e/external-core.e2e.ts`)은 Python 예제 코어가 필요합니다. `python3`(3.11 이상)이 있으면 `bun run test:ui`가 두 번째 인스턴스를 `TESTBED_EXAMPLE_CORES=py-echo PY_ECHO_REPLICAS=2`로 띄우고 주소를 `TESTBED_UI_PY_URL`로 넘깁니다. 없으면 9번은 건너뛰고(이유는 `TESTBED_UI_PYTHON_MISSING`), `TESTBED_REQUIRE_PYTHON=1`이면 실패합니다.
 - CI(`ci.yml`의 `ci` job): 스모크 뒤에 `bunx playwright install --with-deps chromium`과 `TESTBED_REQUIRE_PYTHON=1 bun run test:ui`. 실패하면 `playwright-report/`와 `test-results/`(실패 화면 캡처)를 아티팩트로 올립니다.
+- 샘플 코어를 가정하는 시험(`e2e/dashboard.e2e.ts`)은 매니페스트에 `sample`이 없으면(테스트베드가 `CORES`에서 뺐을 때) 이유를 출력하고 건너뜁니다(M19에서 계약 시험과 샘플 코어 시험으로 다시 씀).
+- **다운스트림 흉내**(`bun run test:downstream`, `src/server/testbed/downstream.integration.test.ts`): 이 작업 트리를 임시 사본으로 복사해 `package.json`의 `name`을 `testbed-demo`로, `PORT_BLOCK`을 `40990`으로, `CORES`를 관찰 코어 하나로 바꾼 뒤 `bun test`(Python 시험 제외: `TESTBED_SKIP_PYTHON=1`), `bun run testbed:smoke`, `bun run test:ui`가 통과하는지 봅니다. 몇 분 걸리므로 `TESTBED_DOWNSTREAM=1`일 때만 돌고(UI는 `TESTBED_DOWNSTREAM_UI=1`), CI가 돌립니다.
 
 testbed-base의 시험은 `docs/spec.md` §11 M10의 수용 기준 1–8(`e2e/dashboard.e2e.ts`)과 M14의 9번(`e2e/external-core.e2e.ts`)입니다. 테스트베드 레포는 고유 화면의 시험을 `e2e/` 아래에 더합니다.

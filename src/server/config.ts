@@ -7,11 +7,13 @@
  */
 import { s, toValidator, type Infer } from '@shared/validation';
 
+import { PORT_BLOCK } from './testbed/cores/port-block';
+
 const configValidator = toValidator(
   s.object({
     appEnv: s._default(s.enum(['local', 'development', 'production']), 'local'),
     /** The testbed's port block +0 (docs/testbed/ports.md). */
-    port: s._default(s.int().check(s.gte(0), s.lte(65535)), 40000),
+    port: s._default(s.int().check(s.gte(0), s.lte(65535)), PORT_BLOCK),
     /** `memory` (default) runs without any external service; testbeds need no database. */
     dbDriver: s._default(s.enum(['postgres', 'memory']), 'memory'),
     databaseUrl: s.optional(s.string().check(s.minLength(1))),

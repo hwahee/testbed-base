@@ -11,7 +11,7 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import type { CoreLog } from '@shared/testbed/control';
 import type { EventLine, TestbedEvent } from '@shared/testbed/events';
 
-import { sampleCore } from '../cores/sample';
+import { sampleCore } from '../testing/sample-core';
 import { REPO_ROOT } from '../smoke/load';
 import { startTestServer, waitForEvent } from '../testing';
 import { defineExternalCore } from './define';

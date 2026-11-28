@@ -92,14 +92,30 @@ export async function tcp(): Promise<TcpClient> {
   };
 }
 
+let registered: Promise<string[]> | undefined;
+
+/** Whether the instance runs core `id` (read once from the manifest). */
+export async function hasCore(id: string): Promise<boolean> {
+  registered ??= api<{ cores: { id: string }[] }>('GET', '/manifest').then(({ body }) =>
+    body.cores.map((core) => core.id),
+  );
+  return (await registered).includes(id);
+}
+
+/** Why the sample core's tests skip on this instance (a testbed that does not register it). */
+export const NO_SAMPLE_CORE =
+  'the sample core is not registered on this instance (a testbed drops it from CORES)';
+
 /**
  * Back to a known state: no lease (forced through the local-only path), no
- * open Run, the sample core running with no fault rules, no TCP clients.
+ * open Run, the sample core (when registered) running with no fault rules,
+ * no TCP clients.
  */
 export async function resetTestbed(): Promise<void> {
   for (const socket of open.splice(0)) socket.destroy();
   await fetch(`${BASE}/testbed/internal/release`, { method: 'POST' });
   await api('POST', '/runs/current/end');
+  if (!(await hasCore('sample'))) return;
   await api('PATCH', '/cores/sample/config', {
     body: { faults: [], maxConnections: 100, maxChunkBytes: 65_536, idleTimeoutMs: 0 },
   });

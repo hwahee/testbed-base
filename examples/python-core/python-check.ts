@@ -4,6 +4,8 @@ const MIN = [3, 11] as const;
 
 /** Why Python cannot be used here, or `undefined` when it can. */
 export function missingPython(): string | undefined {
+  // The downstream simulation (scripts/test-downstream.ts) runs without the Python tests.
+  if (process.env.TESTBED_SKIP_PYTHON === '1') return 'TESTBED_SKIP_PYTHON=1';
   try {
     const probe = Bun.spawnSync([
       'python3',

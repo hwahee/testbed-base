@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import type { TestbedEvent } from '@shared/testbed/events';
 
 import type { Logger } from '../../lib/log';
-import { sampleCore } from '../cores/sample';
+import { sampleCore } from '../testing/sample-core';
 import { REPO_ROOT } from '../smoke/load';
 import { startTestServer, waitForEvent } from '../testing';
 import { defineExternalCore } from './define';

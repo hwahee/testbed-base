@@ -1,5 +1,6 @@
 /**
- * Finds the scenario files: `src/server/testbed/cores/<core>/smoke/*.smoke.ts`
+ * Finds the scenario files: `src/server/testbed/cores/<core>/smoke/*.smoke.ts`,
+ * the common runtime's test cores' `src/server/testbed/testing/<core>/smoke/*.smoke.ts`
  * and `examples/<example>/smoke/*.smoke.ts`, each default-exporting
  * `defineSmoke({...})`. Testbed repositories add them under `cores/` only, so
  * the common runtime never changes for them.
@@ -11,6 +12,9 @@ import type { LoadedScenario } from './runner';
 
 const SCENARIO_GLOBS = [
   'src/server/testbed/cores/*/smoke/*.smoke.ts',
+  // The common runtime's test cores (the sample core): they SKIP where a
+  // testbed does not register the core.
+  'src/server/testbed/testing/*/smoke/*.smoke.ts',
   // The example cores' (they SKIP unless TESTBED_EXAMPLE_CORES turns the core on).
   'examples/*/smoke/*.smoke.ts',
 ];

@@ -72,6 +72,11 @@ jobs:
         env:
           TESTBED_REQUIRE_PYTHON: '1'
 
+      # A testbed that renamed the package, moved the port block and dropped
+      # the sample core still passes the common tests (docs/spec.md §11 M15).
+      - name: Downstream simulation
+        run: bun run test:downstream
+
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v4

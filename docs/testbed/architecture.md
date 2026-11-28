@@ -25,7 +25,7 @@
 hwahee/boilerplate (범용 풀스택)
         │ 이력 이어받기 + docs/upgrade-guides
         ▼
-hwahee/testbed-base ── 공통 런타임, 대시보드 셸, docs/testbed/*, 스펙 템플릿, 샘플 코어
+hwahee/testbed-base ── 공통 런타임, 대시보드 셸, docs/testbed/*, 스펙 템플릿, 시험용 코어(샘플·관찰)
         │ 이력 이어받기 + docs/upgrade-guides (testbed-base 자체 가이드)
         ├──▶ testbed-mcp-mock
         ├──▶ testbed-llm-mock
@@ -45,6 +45,7 @@ hwahee/testbed-base ── 공통 런타임, 대시보드 셸, docs/testbed/*, �
 
 - 공통 런타임 코드는 `src/server/testbed/`, `src/client/testbed/`, `src/shared/testbed/`에 모읍니다. 테스트베드별 코드는 각 폴더의 `cores/<코어 id>/`에 둡니다. 업스트림 머지 때 충돌 면적을 줄이기 위함입니다.
 - 테스트베드 레포에서는 공통 런타임(`src/*/testbed/` 중 `cores/` 밖)을 고치지 않습니다. 필요하면 `testbed-base`에 제안합니다.
+- **시험용 코어**: 샘플 코어(TCP echo)와 관찰 코어는 공통 런타임의 시험 재료이며 `src/server/testbed/testing/sample-core/`·`observer-core/`(이벤트 타입은 `src/shared/testbed/testing/sample-core/`)에 있습니다. 공통 시험은 이 위치에서 직접 가져오고 서버 `CORES`에 기대지 않습니다. `testbed-base`는 `CORES`에 샘플 코어를 등록하고, 테스트베드는 `cores/index.ts`의 그 한 줄만 빼고 자기 코어를 넣습니다(`testing/`은 지우거나 고치지 않음).
 
 ## 3. 프로세스 구조
 

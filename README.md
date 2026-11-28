@@ -105,10 +105,15 @@ push합니다(이력 이어받기).
    git push -u origin main
    ```
 
-3. [docs/testbed/ports.md](docs/testbed/ports.md)에 포트 블록을 등록합니다(첫 작업).
+3. [docs/testbed/ports.md](docs/testbed/ports.md)에 포트 블록을 등록합니다(첫 작업). 블록의 +0을
+   `src/server/testbed/cores/port-block.ts`의 `PORT_BLOCK`에 쓰고, `Dockerfile`·`.env.example`·CI 이미지 job의
+   포트를 같은 블록으로 맞춥니다.
 4. `docs/spec.md`를 [스펙 템플릿](docs/testbed/spec-template.md)으로 다시 쓰고, `package.json`의 `name`과
    워크플로의 `IMAGE`를 새 레포 이름으로 바꿉니다.
-5. 코어는 `src/*/testbed/cores/<코어 id>/`에 만듭니다.
+5. 코어는 `src/*/testbed/cores/<코어 id>/`에 만들고 서버 `src/server/testbed/cores/index.ts`의 `CORES`에 넣습니다.
+   샘플 코어는 그 파일의 `import { sampleCore } from '../testing/sample-core';` 한 줄과 목록의 `sampleCore`만
+   빼면 됩니다. `src/server/testbed/testing/`(샘플 코어 등 공통 시험의 재료)은 지우거나 고치지 않습니다.
+6. UI 시험 서버에 env나 사전 준비(고정 데이터 등)가 필요하면 `e2e/testbed.ts`에 적습니다.
 
 이후 이 저장소의 변경은 `upstream`에서 수동으로 머지합니다.
 

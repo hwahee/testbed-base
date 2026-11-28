@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 
 import type { TestbedSocketMessage } from '@shared/testbed/control';
 
-import { sampleCore } from '../cores/sample';
+import { sampleCore } from '../testing/sample-core';
 import { createTestControlPlane } from '../testing';
 
 describe('WS back-pressure', () => {

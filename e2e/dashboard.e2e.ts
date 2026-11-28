@@ -1,13 +1,33 @@
 /**
  * The dashboard, driven like a person while REST and TCP play the agent and
  * the product (docs/spec.md §11 M10). ARIA first, then `TESTID`.
+ *
+ * Every test here assumes the sample core. On an instance without it (a
+ * testbed that dropped it from `CORES`) they skip and say why; M19 rewrites
+ * them as contract tests and sample-core tests.
  */
 import { expect, test, type Page } from '@playwright/test';
 
 import { TESTID } from '../src/client/testing/testids';
-import { api, echoPort, gateLiveUpdates, resetTestbed, takeLease, tcp } from './helpers';
+import {
+  api,
+  echoPort,
+  gateLiveUpdates,
+  hasCore,
+  NO_SAMPLE_CORE,
+  resetTestbed,
+  takeLease,
+  tcp,
+} from './helpers';
 
+let reported = false;
 test.beforeEach(async () => {
+  const sample = await hasCore('sample');
+  if (!sample && !reported) {
+    reported = true;
+    console.log(`e2e/dashboard.e2e.ts: skipped, ${NO_SAMPLE_CORE}`);
+  }
+  test.skip(!sample, NO_SAMPLE_CORE);
   await resetTestbed();
 });
 
