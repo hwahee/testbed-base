@@ -35,6 +35,10 @@ export const TESTID = {
   /** The dashboard at `/` (docs/spec.md §11 "대시보드 testid", docs/testbed/dashboard.md). */
   testbed: {
     dashboard: 'testbed.dashboard',
+    layout: {
+      /** A layout's view switch (`useLayoutView`): the tab button of view `name`. */
+      view: (name: string) => `testbed.layout.view.${name}`,
+    },
     statusBar: {
       root: 'testbed.status-bar',
       /** The state dot; its `aria-label` says `<core>: <state>`, `data-state` the state. */

@@ -30,8 +30,9 @@ export function DashboardTabs({ tabs }: { tabs: readonly DashboardTab[] }) {
             data-testid={TESTID.testbed.tabs.tab(tab.id)}
             onClick={() =>
               setParams(
-                (current) => {
-                  const next = new URLSearchParams(current);
+                () => {
+                  // From the address as it is now, so keys the router did not write stay.
+                  const next = new URLSearchParams(window.location.search);
                   next.set('tab', tab.id);
                   return next;
                 },

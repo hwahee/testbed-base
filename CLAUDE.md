@@ -74,6 +74,7 @@
   틀렸다고 판단되면 멈추고 묻습니다.
 - 테스트베드 레포에서는 공통 런타임(`src/*/testbed/` 중 `cores/` 밖)을 고치지 않습니다. 필요하면 `testbed-base`에
   제안합니다. `testbed-base` 자신은 예외입니다.
+- 대시보드 배치는 이 테스트베드가 소유합니다(`src/client/testbed/cores/layout.tsx`). 프레임은 고치지 않습니다.
 - 샘플 코어는 공통 시험의 재료입니다. 테스트베드는 등록만 빼고 `testing/sample-core/`는 지우거나 고치지 않습니다.
 - 마일스톤 단위로 작업하고, 그 마일스톤의 수용 기준을 모두 확인한 뒤 끝냅니다([docs/testbed/verification.md](docs/testbed/verification.md)).
 - 공통 런타임을 바꾸면 `docs/testbed/`의 해당 문서를 같은 PR에서 고칩니다.

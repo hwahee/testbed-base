@@ -15,7 +15,9 @@ import { LocaleProvider, useI18n } from './i18n/locale-context';
 import { DesignSystemPage } from './pages/design-system-page';
 import { NotFoundPage } from './pages/not-found-page';
 import { SignInFailedPage } from './pages/sign-in-failed-page';
-import { DashboardPage } from './testbed/dashboard/dashboard-page';
+import { layout as testbedLayout } from './testbed/cores/layout';
+import { TestbedFrame } from './testbed/dashboard/frame';
+import type { DashboardLayout } from './testbed/registry';
 import { TESTID } from './testing/testids';
 import { ThemeProvider } from './theme/theme-context';
 import { Footer } from './ui/footer';
@@ -88,13 +90,14 @@ function AppLayout({ footer = true, wide = false }: { footer?: boolean; wide?: b
  * Routes are ranked by specificity, not by source order, so the `*` fallback
  * below never shadows a concrete path declared in another group.
  */
-function AppRoutes() {
+function AppRoutes({ layout }: { layout: DashboardLayout }) {
   return (
     <Routes>
       {/* Standard chrome: header + footer. */}
-      {/* The testbed dashboard needs the whole width. */}
-      <Route element={<AppLayout wide />}>
-        <Route path="/" element={<DashboardPage />} />
+      {/* The testbed dashboard (the frame around this testbed's layout) needs
+          the whole width; the layout says whether the shared footer stays. */}
+      <Route element={<AppLayout wide footer={layout.footer !== false} />}>
+        <Route path="/" element={<TestbedFrame layout={layout} />} />
       </Route>
 
       <Route element={<AppLayout />}>
@@ -113,7 +116,11 @@ function AppRoutes() {
   );
 }
 
-export function App() {
+/**
+ * `layout`: the dashboard layout on `/`; without it, this testbed's
+ * (`src/client/testbed/cores/layout.tsx`). The test layouts pass their own.
+ */
+export function App({ layout = testbedLayout }: { layout?: DashboardLayout } = {}) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
@@ -123,7 +130,7 @@ export function App() {
                 useOverlay() render here, so they see exactly these contexts
                 and nothing from the subtree that opened them. */}
             <OverlayProvider>
-              <AppRoutes />
+              <AppRoutes layout={layout} />
             </OverlayProvider>
           </BrowserRouter>
         </LocaleProvider>

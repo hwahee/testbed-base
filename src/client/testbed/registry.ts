@@ -1,6 +1,6 @@
 /**
  * Panel slots (docs/testbed/dashboard.md §4): what a testbed adds to the
- * dashboard without touching the shell. A core registers a module in
+ * default layout without touching the frame. A core registers a module in
  * `src/client/testbed/cores/<core>/index.ts`, listed in `cores/index.ts` —
  * the same pattern as the server's `cores/index.ts`.
  */
@@ -28,14 +28,29 @@ export interface ClientCoreModule {
   configForm?: ComponentType<ConfigFormProps>;
 }
 
+/**
+ * The layout contract (docs/testbed/dashboard.md §0): what a testbed's
+ * `src/client/testbed/cores/layout.tsx` exports. The frame (status bar, lease
+ * banner, selection, store) is drawn around it.
+ * @public 배치 계약 (docs/testbed/dashboard.md)
+ */
+export interface DashboardLayout {
+  /** 'default' 또는 테스트베드가 정한 이름. <html data-layout>과 시험 어댑터가 씀 */
+  id: string;
+  /** 프레임 안의 화면 전체 */
+  Dashboard: ComponentType;
+  /** 공통 푸터를 둘지. 기본 true */
+  footer?: boolean;
+}
+
 export interface DashboardTab {
   id: string;
   title: MessageKey;
-  /** Common tabs are drawn by the shell; core tabs bring their component. */
+  /** Common tabs are drawn by the default layout; core tabs bring their component. */
   component?: ComponentType;
 }
 
-/** The common tabs, first in this order; the shell draws their views. */
+/** The common tabs, first in this order; the default layout draws their views. */
 export const COMMON_TABS: readonly DashboardTab[] = [
   { id: 'events', title: 'testbed.tab.events' },
   { id: 'stats', title: 'testbed.tab.stats' },

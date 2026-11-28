@@ -98,6 +98,7 @@
 | `testbed.open-cores` / `testbed.open-detail`                                                   | 1024px 미만에서 코어 열·상세를 여는 버튼                                                                                                        |
 | `testbed.cores-overlay` / `testbed.detail-overlay`                                             | 그때 열리는 사이드바·바텀시트(`.panel`, `.close` 파생)                                                                                          |
 
+- 대시보드의 배치는 `<html data-layout="<배치 id>">`(기본 배치는 `default`)로 관찰합니다. 배치가 보기를 둘 이상 두면 보기 전환 탭 버튼의 testid는 `testbed.layout.view.<name>`(`TESTID.testbed.layout.view(name)`)입니다.
 - 락 상태는 `<html data-lease="none|agent|ci">`와 조작 컨트롤의 `aria-disabled="true"`로 관찰합니다. 코어 상태에 맞지 않는 start/stop(`running` 코어의 start 등)은 락과 별개로 `disabled`입니다([testbed/dashboard.md](testbed/dashboard.md) §1.2).
 - 실시간 값은 WS로 100ms 묶음으로 들어오므로 고정 시간 대신 요소·속성의 변화를 기다립니다.
 

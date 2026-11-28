@@ -242,8 +242,13 @@ export function EventLog() {
       <Filters
         filter={filter}
         set={(patch) =>
+          // From the address as it is now (window.location, not the router's
+          // copy), so keys the router did not write (a layout's `?view=`) stay.
           setParams(
-            (current) => filterToParams({ ...filterFromParams(current), ...patch }, current),
+            () => {
+              const now = new URLSearchParams(window.location.search);
+              return filterToParams({ ...filterFromParams(now), ...patch }, now);
+            },
             { replace: true },
           )
         }
