@@ -1,6 +1,34 @@
 # 대시보드
 
-메인 페이지 `/`가 대시보드입니다. `testbed-base`가 셸과 공통 컴포넌트를 주고, 각 테스트베드는 고유 화면을 **패널 슬롯**에 등록합니다. 셸은 고치지 않습니다.
+메인 페이지 `/`가 대시보드입니다. `testbed-base`가 **프레임**과 공통 컴포넌트, 그리고 교체할 수 있는 **기본 배치**를 줍니다. 각 테스트베드는 자기 **배치**를 소유합니다(기본 배치를 그대로 쓰거나, 패널 슬롯으로 탭만 더하거나, 새로 짬). 프레임은 고치지 않습니다.
+
+## 0. 프레임과 배치
+
+| 부분                                                                         | 소유        | 내용                                                                                                                                                                                                                                                        |
+| ---------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 프레임 `TestbedFrame`(`src/client/testbed/dashboard/frame.tsx`)              | 공통 런타임 | 스토어(`TestbedStoreProvider`), 로그인 판정(로그인 필요면 안내만), 매니페스트 조회와 브라우저 탭 제목, `<html data-lease>`, 상태 바, 락 배너, 재시작 알림, 선택(`SelectionProvider`), `<html data-layout="<배치 id>">`. 그 아래에 배치의 `Dashboard`를 그림 |
+| 배치 모듈 `src/client/testbed/cores/layout.tsx`                              | 테스트베드  | `export const layout: DashboardLayout`. 이 저장소는 `defaultLayout`                                                                                                                                                                                         |
+| 기본 배치 `defaultLayout`(`src/client/testbed/dashboard/default-layout.tsx`) | 공통 런타임 | 코어 열 · 주 영역 탭 · 상세 패널(§1.1). 교체할 수 있는 기본값이며 테스트베드가 따라 할 본보기가 아님                                                                                                                                                        |
+
+```ts
+/** @public 배치 계약 (src/client/testbed/registry.ts) */
+interface DashboardLayout {
+  /** 'default' 또는 테스트베드가 정한 이름. <html data-layout>과 시험 어댑터가 씀 */
+  id: string;
+  /** 프레임 안의 화면 전체 */
+  Dashboard: ComponentType;
+  /** 공통 푸터를 둘지. 기본 true */
+  footer?: boolean;
+}
+```
+
+- 프레임은 주소의 쿼리를 읽거나 지우지 않습니다. 쿼리는 배치의 것입니다(`?tab=`, `?view=`, 이벤트 로그 필터).
+- `App`(`src/client/app.tsx`)은 `layout?: DashboardLayout`을 받고, 없으면 `cores/layout.tsx`의 것을 씁니다. `/`는 프레임 + 배치이고, `layout.footer === false`면 푸터 없이 그립니다.
+- **보기 전환** `useLayoutView(views, defaultView)`(`dashboard/layout-view.ts`): 배치가 보기 둘 이상(예: "실시간"/"지난 기록")을 두고 고른 보기를 주소 `?view=`에 남깁니다. `[view, setView]`를 돌려주고, `setView`는 `history.replaceState`로 `view`만 바꿉니다(다른 쿼리는 그대로, 기본 보기면 `view`를 뺌). 주소의 값이 `views`에 없으면 기본 보기를 쓰고 주소는 고치지 않습니다. 새로고침·주소 공유·뒤로 가기 후에도 같은 보기입니다. 라우터는 쓰지 않습니다. 보기 전환 탭 버튼의 testid는 `testbed.layout.view(name)`입니다. 기본 배치는 `?view=`를 쓰지 않습니다.
+- 이벤트 로그 필터와 기본 배치의 탭은 주소를 바꿀 때 그 순간의 `window.location`에서 시작하므로, 라우터가 모르는 키(`?view=`)를 지우지 않습니다.
+- **선택 알림** `useSelectListener(listener)`(`views/selection.tsx`): 이벤트를 고를 때마다(같은 이벤트를 다시 골라도) 불립니다. 고른 뒤에 무엇을 할지(예: 좁은 화면에서 상세 시트 열기)는 배치가 정합니다.
+- **매니페스트 훅** `useTestbedManifest()`(`store/hooks.ts`): 프레임과 배치가 같은 쿼리 키(`['testbed', 'manifest', instanceId]`)를 씁니다.
+- 테스트베드 소유 파일: `src/client/testbed/cores/layout.tsx`. 공통 런타임은 처음 만든 뒤 고치지 않습니다.
 
 ## 1. 공통 컴포넌트
 
@@ -15,7 +43,7 @@
 | Run 패널          | 열린 Run과 시작·종료, 지난 Run 목록, 요약, check 결과, 내보내기, 다른 주체가 닫은 Run·교체·재시작 표시(§1.5)                                            |
 | 에이전트 타임라인 | actor=`agent`인 이벤트와 사람이 아닌 주체의 `testbed.control.*`, `testbed.lease.*`만 시간순으로. 항목마다 caller 이름과 세션 앞 4자(§1.5)               |
 
-### 1.1 영역
+### 1.1 기본 배치
 
 | 영역      | 위치(1024px 이상)                    | 1024px 미만                                                    |
 | --------- | ------------------------------------ | -------------------------------------------------------------- |
@@ -29,7 +57,7 @@
 - 브라우저 탭 제목은 매니페스트 이름으로 "`<name>` · 테스트베드"입니다(매니페스트를 받기 전에는 "Testbed"). 여러 테스트베드를 탭으로 띄워도 구분됩니다. 머리글과 푸터의 서비스명은 "테스트베드"(`app.title`)이고, 푸터의 관련 서비스는 `public/sitemap.json`(testbed-base, Boilerplate)입니다.
 - 상태 바: 이름, 버전, `instanceId` 앞 8자, 코어별 상태 점(전체 상태의 색 + `aria-label` "`<core>: <state>`", 외부 코어는 "`<core>: <state> (2 replicas)`"처럼 복제 수를 덧붙임), 열린 Run(label과 경과 시간, 1초마다 갱신), 실시간 연결 상태(연결 중 / 연결됨 / 다시 연결 중).
 - `AUTH_DRIVER=oidc`인데 로그인하지 않았으면 대시보드 대신 "로그인 필요" 안내와 보일러플레이트의 로그인 컨트롤을 보여 줍니다. 판정: WS가 아무 메시지 없이 닫히면 `GET /testbed/api/status`를 불러 보고, 401이면 로그인 필요로 보고 다시 연결하지 않습니다.
-- 구현: `src/client/testbed/dashboard/`(셸), `src/client/testbed/store/`(스토어), `src/client/testbed/registry.ts`(패널 슬롯), `src/client/testbed/connection.ts`(연결 패널 조각).
+- 구현: `src/client/testbed/dashboard/`(프레임 `frame.tsx`, 기본 배치 `default-layout.tsx`), `src/client/testbed/store/`(스토어), `src/client/testbed/registry.ts`(패널 슬롯), `src/client/testbed/connection.ts`(연결 패널 조각).
 
 ### 1.2 코어 카드
 
@@ -162,9 +190,9 @@
 - **디자인**: 보일러플레이트 디자인 시스템(스킨, 토큰, `src/client/ui/*`)을 그대로 씁니다.
 - **코어는 브라우저에 두지 않습니다.** 화면은 보여 주고 REST로 명령을 보내기만 합니다.
 
-## 4. 패널 슬롯
+## 4. 패널 슬롯 (기본 배치를 쓸 때)
 
-테스트베드는 셸을 고치지 않고 `src/client/testbed/cores/<core id>/index.ts`에서 모듈을 내보내고, `src/client/testbed/cores/index.ts`의 `CLIENT_CORES`에 올립니다(서버의 `cores/index.ts`와 같은 방식).
+기본 배치를 쓰는 테스트베드는 프레임을 고치지 않고 `src/client/testbed/cores/<core id>/index.ts`에서 모듈을 내보내고, `src/client/testbed/cores/index.ts`의 `CLIENT_CORES`에 올립니다(서버의 `cores/index.ts`와 같은 방식).
 
 ```ts
 interface ClientCoreModule {

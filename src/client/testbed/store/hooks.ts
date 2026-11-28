@@ -14,10 +14,13 @@ import {
   type ReactNode,
 } from 'react';
 
-import type { TestbedStatus } from '@shared/testbed/control';
+import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+
+import type { TestbedManifest, TestbedStatus } from '@shared/testbed/control';
 import { matchesFilter, type EventFilter, type TestbedEvent } from '@shared/testbed/events';
 import type { LeaseView } from '@shared/testbed/lease';
 
+import { testbedApi } from '../../api/endpoints';
 import { TestbedStore, type TestbedSnapshot } from './store';
 
 const StoreContext = createContext<TestbedStore | null>(null);
@@ -48,6 +51,20 @@ function useStore(): TestbedStore {
 export function useTestbed(): TestbedSnapshot {
   const store = useStore();
   return useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
+}
+
+/**
+ * The manifest (`GET /manifest`), read again when the instance changes. The
+ * frame and the layout share this query key.
+ * @public (docs/testbed/dashboard.md §0)
+ */
+export function useTestbedManifest(): UseQueryResult<TestbedManifest> {
+  const instanceId = useTestbed().status?.instanceId;
+  return useQuery({
+    queryKey: ['testbed', 'manifest', instanceId] as const,
+    queryFn: () => testbedApi.manifest(),
+    enabled: instanceId !== undefined,
+  });
 }
 
 /** Clears the "testbed restarted" notice. */
