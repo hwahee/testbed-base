@@ -13,7 +13,7 @@ import { TestbedError } from '../../errors';
 import { EventBus } from '../../events/bus';
 import { createMemoryRunStore } from '../../runs/memory-store';
 import { RunManager } from '../../runs/runs';
-import { TcpClient, waitForEvent } from '../../testing';
+import { TcpClient, waitForEvent } from '..';
 import { sampleCore } from '.';
 
 const cleanups: (() => Promise<void>)[] = [];

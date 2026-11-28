@@ -3,6 +3,8 @@
  * app as the server builds it, with the sample core, on ephemeral ports.
  */
 import { afterEach, describe, expect, test } from 'bun:test';
+
+import packageJson from '../../../../package.json';
 import { mkdtemp, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -11,7 +13,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Caller, EventLine, TestbedEvent } from '@shared/testbed/events';
 
-import { sampleCore } from '../cores/sample';
+import { sampleCore } from '../testing/sample-core';
 import { startTestServer, TcpClient, waitForEvent } from '../testing';
 import { MCP_INSTRUCTIONS } from './endpoint';
 
@@ -188,7 +190,7 @@ describe('testbed_info', () => {
       run: unknown;
       lease: unknown;
     };
-    expect(info.name).toBe('testbed-base');
+    expect(info.name).toBe(packageJson.name);
     expect(info.cores[0]?.id).toBe('sample');
     expect(info.cores[0]?.endpoints[0]?.protocol).toBe('tcp');
     expect(info.cores[0]?.actions).toEqual(['broadcast']);

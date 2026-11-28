@@ -13,7 +13,9 @@ const KEPT_LINES = 40;
 
 export interface LocalTestbed {
   url: string;
-  stop(): Promise<void>;
+  /** The server process. */
+  pid: number;
+  stop(this: void): Promise<void>;
 }
 
 /** The server did not come up (exit code 2). */
@@ -87,7 +89,7 @@ export async function startLocalTestbed(
     }
     try {
       const response = await fetch(`${url}/api/health/ready`);
-      if (response.status === 200) return { url, stop };
+      if (response.status === 200) return { url, pid: child.pid, stop };
     } catch {
       // Not listening yet.
     }

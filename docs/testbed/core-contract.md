@@ -52,6 +52,7 @@ interface CoreInstance {
 
 - **id**: 소문자, 숫자, `-`만 씁니다(`^[a-z][a-z0-9-]*$`). MCP 도구 이름에서는 `-`를 `_`로 바꿉니다. `testbed`는 공통 런타임 자신의 자리라 쓰지 않습니다.
 - **코드 위치**: 코어 코드는 `src/server/testbed/cores/<id>/`, 이벤트 payload 스키마는 `src/shared/testbed/cores/<id>/events.ts`, 고유 화면은 `src/client/testbed/cores/<id>/`, MCP 스모크 시나리오는 `src/server/testbed/cores/<id>/smoke/*.smoke.ts`([verification.md](verification.md) §4)에 둡니다.
+- **시험용 코어**: 공통 런타임의 샘플 코어는 `src/server/testbed/testing/sample-core/`(시나리오는 그 아래 `smoke/`, 이벤트 타입은 `src/shared/testbed/testing/sample-core/events.ts`), 관찰 코어는 `testing/observer-core/`에 있습니다. 코어를 만드는 예로 읽어도 되지만, 테스트베드는 이 파일들을 고치지 않습니다(공통 시험의 재료). `Math.random` 금지 규칙은 `testing/*-core/`에도 적용됩니다.
 - **무작위**: `Math.random()`을 쓰지 않습니다. `ctx.rng`만 씁니다(ESLint가 `src/server/testbed/cores/**`에서 막음).
 - **관찰 가능한 일은 모두 이벤트로** 남기고 `summary`를 반드시 채웁니다([events.md](events.md)).
 - **비밀값**은 이벤트에 담기 전에 공통 가림 유틸을 거칩니다.

@@ -8,6 +8,7 @@
 - 이 대장이 유일한 배정 기록입니다. **새 테스트베드는 블록을 이 표에 등록하는 일부터 시작합니다**(`testbed-base`에 PR).
 - 다음 블록은 표의 마지막 블록 다음 10개입니다. 비거나 반납된 블록을 다시 쓰지 않습니다.
 - 데이터면 포트도 env(`<CORE_ID>_PORT` 등)로 바꿀 수 있습니다. 클라우드에서 여러 인스턴스를 띄울 때 씁니다. 대장은 기본값만 기록합니다.
+- **새 테스트베드의 포트 설정**: 블록을 등록한 뒤, 코드의 기본 포트는 테스트베드 소유 파일 `src/server/testbed/cores/port-block.ts`(`export const PORT_BLOCK = <+0>;`) 한 곳에서 바꿉니다. 서버 설정의 `PORT` 기본값, `bun run testbed:release`, 포트를 보는 공통 시험이 이 값을 읽습니다. 이미지와 예시 env는 `Dockerfile`(`ENV PORT`, `EXPOSE`)과 `.env.example`, CI의 이미지 job(`-p` 포트 블록)에서 같은 값으로 맞춥니다.
 
 ## 2. 배정
 

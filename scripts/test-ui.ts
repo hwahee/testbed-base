@@ -2,8 +2,10 @@
  * `bun run test:ui` — the Playwright UI tests (docs/testbed/verification.md §5).
  *
  * Boots this repo's server on a free port the same way the MCP smoke does
- * (`TESTBED_RUN_STORE=memory`, every core port at 0), runs `playwright test`
- * against it with any arguments given here, then stops the server.
+ * (`TESTBED_RUN_STORE=memory`, every core port at 0) with the testbed's own
+ * preparation (`e2e/testbed.ts`: env and `prepare()`), runs `playwright test`
+ * against it with any arguments given here, then stops the server. The common
+ * runtime's variant instances (the Python one) do not get that preparation.
  *
  * Test 9 needs the Python example core: with `python3` (3.11+) a second
  * instance runs with `TESTBED_EXAMPLE_CORES=py-echo PY_ECHO_REPLICAS=2` and
@@ -13,6 +15,8 @@
  *   bun run test:ui                 # all tests
  *   bun run test:ui -g "lease"      # by title
  */
+import { startSetupTestbed } from '../e2e/support/testbed-setup';
+import { setup } from '../e2e/testbed';
 import { missingPython } from '../examples/python-core/python-check';
 import {
   startLocalTestbed,
@@ -22,9 +26,15 @@ import {
 
 const running: LocalTestbed[] = [];
 
-async function start(env?: Record<string, string>): Promise<LocalTestbed> {
+async function start(
+  env?: Record<string, string>,
+  options: { setup?: boolean } = {},
+): Promise<LocalTestbed> {
   try {
-    const testbed = await startLocalTestbed(env === undefined ? {} : { env });
+    const testbed =
+      options.setup === true
+        ? await startSetupTestbed(setup)
+        : await startLocalTestbed(env === undefined ? {} : { env });
     running.push(testbed);
     return testbed;
   } catch (error) {
@@ -34,7 +44,7 @@ async function start(env?: Record<string, string>): Promise<LocalTestbed> {
   }
 }
 
-const testbed = await start();
+const testbed = await start(undefined, { setup: true });
 const missing = missingPython();
 const python =
   missing === undefined

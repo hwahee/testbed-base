@@ -1,6 +1,7 @@
 /**
  * The ESLint rule that keeps cores reproducible: `Math.random()` fails lint
- * under `src/server/testbed/cores/**` (docs/testbed/faults-and-seed.md §2).
+ * under `src/server/testbed/cores/**` and the common runtime's test cores
+ * `src/server/testbed/testing/*-core/**` (docs/testbed/faults-and-seed.md §2).
  * Lints source text against the repository's own config; type-aware rules
  * are off because the text is not a file in the TypeScript project.
  */
@@ -24,6 +25,15 @@ describe('no Math.random in cores', () => {
       await ruleIds(
         'export const roll = Math.random();\n',
         'src/server/testbed/cores/sample/roll.ts',
+      ),
+    ).toEqual(['no-restricted-properties']);
+  });
+
+  test('the common runtime’s test cores (testing/*-core) are cores too', async () => {
+    expect(
+      await ruleIds(
+        'export const roll = Math.random();\n',
+        'src/server/testbed/testing/sample-core/roll.ts',
       ),
     ).toEqual(['no-restricted-properties']);
   });

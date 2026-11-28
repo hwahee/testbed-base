@@ -4,15 +4,15 @@
  */
 import type { TestbedEvent } from '@shared/testbed/events';
 
-import { buildApp } from '../app';
-import { loadServerConfig, type ServerConfig } from '../config';
-import { createContainer } from '../container';
-import { silentLogger, type Logger } from '../lib/log';
-import { loadTestbedConfig } from './config';
-import type { EventBus } from './events/bus';
-import type { AnyCoreDefinition } from './core-host';
-import { REPO_ROOT } from './smoke/load';
-import { createControlPlane, createTestbedRuntime } from './runtime';
+import { buildApp } from '../../app';
+import { loadServerConfig, type ServerConfig } from '../../config';
+import { createContainer } from '../../container';
+import { silentLogger, type Logger } from '../../lib/log';
+import { loadTestbedConfig } from '../config';
+import type { EventBus } from '../events/bus';
+import type { AnyCoreDefinition } from '../core-host';
+import { REPO_ROOT } from '../smoke/load';
+import { createControlPlane, createTestbedRuntime } from '../runtime';
 
 /**
  * A runtime and control plane as the server builds them, with every port at 0

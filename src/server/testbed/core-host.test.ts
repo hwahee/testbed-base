@@ -7,7 +7,7 @@ import { silentLogger } from '../lib/log';
 import type { CoreDefinition } from './core';
 import { CoreHost } from './core-host';
 import { EventBus } from './events/bus';
-import { sampleCore } from './cores/sample';
+import { sampleCore } from './testing/sample-core';
 import { createMemoryRunStore } from './runs/memory-store';
 import { RunManager } from './runs/runs';
 

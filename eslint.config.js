@@ -151,7 +151,11 @@ export default tseslint.config(
   },
   // Reproducibility: cores use the seeded ctx.rng, never Math.random.
   {
-    files: ['src/server/testbed/cores/**/*.{ts,tsx}'],
+    files: [
+      'src/server/testbed/cores/**/*.{ts,tsx}',
+      // The common runtime's test cores are cores too.
+      'src/server/testbed/testing/*-core/**/*.{ts,tsx}',
+    ],
     rules: {
       'no-restricted-properties': [
         'error',

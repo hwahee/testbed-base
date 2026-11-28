@@ -7,9 +7,11 @@
     "src/**/*.test.{ts,tsx}",
     "scripts/*.ts",
     "src/server/testbed/cores/*/smoke/*.smoke.ts",
+    "src/server/testbed/testing/*/smoke/*.smoke.ts",
     "examples/**/*.ts",
     "src/server/testbed/external/fake-core.ts",
-    "e2e/*.e2e.ts"
+    "e2e/*.e2e.ts",
+    "e2e/**/*.test.ts"
   ],
   "project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts", "e2e/**/*.ts", "examples/**/*.ts"],
   "ignoreBinaries": ["index.js"]

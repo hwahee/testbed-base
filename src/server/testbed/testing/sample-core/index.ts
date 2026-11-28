@@ -5,7 +5,10 @@
  */
 import { createHash } from 'node:crypto';
 
-import type { SampleCloseReason, SampleEventPayloads } from '@shared/testbed/cores/sample/events';
+import type {
+  SampleCloseReason,
+  SampleEventPayloads,
+} from '@shared/testbed/testing/sample-core/events';
 import type { Actor } from '@shared/testbed/events';
 import { s, toValidator } from '@shared/validation';
 
